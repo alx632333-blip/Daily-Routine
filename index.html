@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Day Builders — англійська гра</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&display=swap">
+<style>
+:root{--ink:#1d1b3a;--card:#fffdf5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;font-family:'Nunito','Trebuchet MS',system-ui,sans-serif;color:var(--ink);background:linear-gradient(#6ec6ff 0%,#bfe9ff 60%,#e8f8ff 100%) fixed;overflow-x:hidden}
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:34px;background:repeating-linear-gradient(90deg,#4caf50 0 32px,#43a047 32px 64px);border-top:8px solid #2e7d32;z-index:-1}
+#app{max-width:820px;margin:0 auto;padding:10px 14px 70px}
+h1{font-size:clamp(34px,8vw,58px);text-align:center;margin:6px 0;text-shadow:3px 3px 0 #fff;line-height:1.05}
+.sub{text-align:center;font-size:20px;margin-bottom:12px}
+.top{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px}
+.pill{background:var(--card);border:4px solid var(--ink);box-shadow:0 4px 0 var(--ink);padding:4px 14px;font:inherit;font-size:20px;font-weight:700;color:var(--ink);cursor:pointer;border-radius:6px}
+.panel{background:var(--card);border:4px solid var(--ink);box-shadow:0 8px 0 var(--ink);border-radius:8px;padding:16px;margin-top:10px}
+.c{text-align:center}
+.lab{font-size:20px;font-weight:700;margin:12px 0 6px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.sg{flex:1;min-width:90px;font:inherit;font-size:20px;font-weight:700;padding:10px;border:4px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;border-radius:6px;box-shadow:0 4px 0 var(--ink)}
+.sg.on{background:#ffd23f;transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.go,.ghost{display:block;width:100%;margin-top:14px;font:inherit;font-size:26px;font-weight:700;padding:12px;border:4px solid var(--ink);border-radius:6px;cursor:pointer;color:var(--ink);box-shadow:0 6px 0 var(--ink)}
+.go{background:#4cd964}.ghost{background:#fff;font-size:20px}
+.go:active,.ghost:active,.opt:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink)}
+.tw{display:flex;gap:10px;justify-content:center;align-items:flex-end;margin:8px 0}
+.col{flex:1;max-width:150px;text-align:center}
+.stack{display:flex;flex-direction:column-reverse;background:rgba(255,255,255,.45);border:3px dashed rgba(29,27,58,.4);padding:0 2px}
+.stack i{display:block;width:100%;border-bottom:2px solid rgba(0,0,0,.0)}
+.stack i.f{box-shadow:inset 3px 3px 0 rgba(255,255,255,.45),inset -3px -3px 0 rgba(0,0,0,.28);border:2px solid var(--ink)}
+.stack i.nw{animation:drop .5s}
+@keyframes drop{from{transform:translateY(-120px);opacity:0}}
+.nm{font-weight:700;font-size:19px;margin-top:6px;background:var(--card);border:3px solid var(--ink);border-radius:6px}
+.col.on .nm{background:#ffd23f}
+.turn{display:inline-block;color:#fff;font-weight:700;font-size:20px;padding:4px 14px;border:3px solid var(--ink);border-radius:6px;text-shadow:2px 2px 0 rgba(0,0,0,.4)}
+.qe{font-size:72px;line-height:1.1;margin-top:6px;text-align:center}
+.qp{font-size:clamp(26px,6.5vw,38px);font-weight:700;text-align:center;margin:4px 0 14px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.opts{grid-template-columns:1fr}}
+.opt{font:inherit;font-size:clamp(20px,5vw,26px);font-weight:700;padding:16px 8px;border:4px solid var(--ink);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer;box-shadow:0 6px 0 var(--ink)}
+.opt:nth-child(1){background:#ffe27a}.opt:nth-child(2){background:#9fe6ff}.opt:nth-child(3){background:#ffb7d5}.opt:nth-child(4){background:#b7f0b0}
+.opt.good{background:#4cd964!important;animation:pop .4s}
+.opt.bad{background:#ff6b6b!important;animation:shake .4s}
+.opt:disabled{cursor:default}
+@keyframes pop{50%{transform:scale(1.06)}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.msg{min-height:34px;font-size:24px;font-weight:700;text-align:center;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.fc{background:#fff;border:3px solid var(--ink);border-radius:6px;padding:10px;text-align:center;box-shadow:0 4px 0 var(--ink)}
+.fc .e{font-size:46px}.fc b{display:block;font-size:20px}.fc span{display:block;opacity:.7;font-size:15px}.fc em{font-style:normal;color:#c2185b;font-weight:600}
+.opt:nth-child(5){background:#ffd1a6}.opt:nth-child(6){background:#d9c7ff}.opt:disabled:not(.good){opacity:.55}
+.t2{grid-template-columns:1fr 1fr!important}.t2 .opt{font-size:clamp(17px,4.4vw,24px);padding:18px 6px}
+.rule{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;font-weight:800;font-size:19px;margin-bottom:6px}.rule span{background:#fff;border:3px solid var(--ink);border-radius:6px;padding:2px 12px}
+.sc{display:flex;gap:14px;justify-content:center;align-items:center}.sc div{font-size:60px;line-height:1.1}
+.line{min-height:84px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;border:4px dashed var(--ink);border-radius:8px;padding:8px;background:#fff;margin:10px 0}
+.bank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0}
+.tl{font:inherit;font-weight:800;font-size:clamp(20px,5vw,26px);padding:10px 14px;border:4px solid var(--ink);border-radius:6px;background:#ffe27a;color:var(--ink);cursor:pointer;box-shadow:0 5px 0 var(--ink)}
+.bank .tl:nth-child(2n){background:#9fe6ff}.bank .tl:nth-child(3n){background:#ffb7d5}.line .tl{background:#b7f0b0}.line.bad{animation:shake .4s}.line.ok{background:#c9f7d1}
+.tbar{height:22px;border:3px solid var(--ink);border-radius:6px;background:#fff;position:relative;margin:10px 0 0;overflow:hidden}.tbar i{display:block;height:100%;width:100%;background:#4cd964;transition:width .1s linear}.tbar b{position:absolute;inset:0;text-align:center;font-size:15px;line-height:16px}
+.conf{position:fixed;top:-30px;font-size:30px;animation:fall 2.8s linear forwards;pointer-events:none;z-index:9}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const W=[
+{en:'have a shower',tr:'хев е ша́уе',ua:'приймати душ',e:'🚿',t:['morning','evening']},
+{en:'go to bed',tr:'ґоу ту бед',ua:'лягати спати',e:'🛏️',t:['evening']},
+{en:'get up',tr:'ґет ап',ua:'вставати (з ліжка)',e:'⏰',t:['morning']},
+{en:'brush my teeth',tr:'браш май тіс',ua:'чистити зуби',e:'🪥',t:['morning','evening']},
+{en:'get dressed',tr:'ґет дресд',ua:'одягатися',e:'👕',t:['morning']},
+{en:'do my homework',tr:'ду май хо́умворк',ua:'робити домашнє завдання',e:'📚',t:['afternoon']},
+{en:'brush my hair',tr:'браш май хеа',ua:'розчісувати волосся',e:'💇',t:['morning']},
+{en:'go to school',tr:'ґоу ту ску́л',ua:'йти до школи',e:'🎒',t:['morning']}];
+const T=[
+{id:'morning',en:'in the morning',tr:'ін зе мо́нінґ',ua:'вранці',e:'🌅'},
+{id:'afternoon',en:'in the afternoon',tr:'ін зі а́фтенун',ua:'вдень',e:'☀️'},
+{id:'evening',en:'in the evening',tr:'ін зі і́внінґ',ua:'ввечері',e:'🌙'}];
+const TM=[{n:'Лисиці',e:'🦊',c:'#ff8a2b'},{n:'Дракони',e:'🐲',c:'#2fbf5f'},{n:'Роботи',e:'🤖',c:'#3d8bff'},{n:'Єдинороги',e:'🦄',c:'#b95cff'}];
+const $=s=>document.querySelector(s),app=$('#app'),sh=a=>[...a].sort(()=>Math.random()-.5),pick=a=>a[Math.random()*a.length|0];
+let cfg={mode:'team',n:3,goal:10,time:20},G,lastW,lastTy;
+try{const s=JSON.parse(localStorage.getItem('db_cfg'));if(s)cfg=s}catch(e){}
+if(cfg.time===undefined)cfg.time=20;
+function set(k,v){cfg[k]=v;try{localStorage.setItem('db_cfg',JSON.stringify(cfg))}catch(e){}home()}
+const seg=(k,v,l)=>`<button class="sg ${cfg[k]===v?'on':''}" onclick="set('${k}',${typeof v=='string'?`'${v}'`:v})">${l}</button>`;
+function confetti(){for(let i=0;i<32;i++){const s=document.createElement('span');s.className='conf';s.textContent=['⭐','🎉','✨','💎'][i%4];s.style.left=Math.random()*100+'vw';s.style.animationDelay=Math.random()*.9+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),3800)}}
+
+function home(){clearInterval(tm);app.innerHTML=`<h1>⛏️ Day Builders</h1><div class="sub">Відповідай правильно — і будуй вежу з блоків!</div>
+<div class="panel"><div class="lab">🧱 Будівництво вежі: хто грає?</div><div class="seg">${seg('mode','solo','🧍 Сам(а)')}${seg('mode','team','👥 Команди')}</div>
+${cfg.mode=='team'?`<div class="lab">Скільки команд?</div><div class="seg">${[2,3,4].map(n=>seg('n',n,n)).join('')}</div>`:''}
+<div class="lab">Висота вежі</div><div class="seg">${[6,10,15].map(n=>seg('goal',n,n+' блоків')).join('')}</div>
+<div class="lab">⏱ Час на відповідь</div><div class="seg">${[10,20,0].map(n=>seg('time',n,n?n+' с':'♾️ без часу')).join('')}</div>
+<button class="go" onclick="start()">🧱 ГРАТИ</button><button class="ghost" onclick="cheat()">📖 Шпаргалка зі словами</button></div>
+<div class="panel"><div class="lab" style="margin-top:0">⚡ Швидкі ігри</div><button class="go" style="background:#ffd23f;margin-top:6px" onclick="tap()">⚡ Швидкий тап (45 с)</button><button class="go" style="background:#b7f0b0" onclick="sent(1)">🧩 Збери речення · рівень 1 ⭐</button><button class="go" style="background:#7fe0a0" onclick="sent(2)">🧩 Збери речення · рівень 2 ⭐⭐</button></div>`}
+
+function cheat(){app.innerHTML=`<div class="top"><button class="pill" onclick="home()">🏠 Меню</button></div><h1>📖 Слова</h1><div class="grid">${W.map(w=>`<div class="fc"><div class="e">${w.e}</div><b>${w.en}</b><span>[${w.tr}]</span><em>${w.ua}</em></div>`).join('')}${T.map(t=>`<div class="fc"><div class="e">${t.e}</div><b>${t.en}</b><span>[${t.tr}]</span><em>${t.ua}</em></div>`).join('')}</div>`}
+
+function start(){const solo=cfg.mode=='solo';G={solo,goal:cfg.goal,turn:0,hearts:3,streak:0,teams:(solo?[{n:'Ти',e:'⛏️',c:'#ff8a2b'}]:TM.slice(0,cfg.n)).map(t=>({...t,b:0}))};ask()}
+
+function makeQ(){let ty,w;do ty=pick('ABCDE');while(ty==lastTy);do w=pick(W);while(w==lastW);lastTy=ty;lastW=w;
+const O=f=>sh([w,...sh(W.filter(x=>x!==w)).slice(0,3)]).map(x=>({l:f(x),ok:x===w}));
+if(ty=='A')return{big:w.e,p:'Як це англійською?',o:O(x=>x.en)};
+if(ty=='B')return{big:'🗣️',p:`«${w.en}» — що це?`,o:O(x=>x.ua)};
+if(ty=='C')return{big:'💬',p:`«${w.ua}» — англійською?`,o:O(x=>x.en)};
+if(ty=='D'){const t=pick(T),g=sh(W.filter(x=>x.t.includes(t.id)))[0],b=sh(W.filter(x=>!x.t.includes(t.id))).slice(0,3);
+return{big:t.e,p:`I ____ ${t.en}.`,o:sh([g,...b]).map(x=>({l:x.e+' '+x.en,ok:x.t.includes(t.id)}))}}
+return{big:w.e,p:`I ${w.en} ____.`,o:T.map(t=>({l:t.e+' '+t.en,ok:w.t.includes(t.id)}))}}
+
+function towers(){const H=200,g=G.goal;$('#tw').className='tw';$('#tw').innerHTML=G.teams.map((t,i)=>`<div class="col ${i==G.turn?'on':''}"><div class="stack" style="height:${H}px">${Array.from({length:g},(_,k)=>`<i class="${k<t.b?'f':''}${k==t.b-1&&G.new==i?' nw':''}" style="height:${H/g}px;${k<t.b?'background:'+t.c:''}"></i>`).join('')}</div><div class="nm">${t.e} ${t.b}/${g}</div></div>`).join('')}
+
+function ask(){const q=makeQ(),t=G.teams[G.turn];G.q=q;G.lock=0;G.new=-1;
+app.innerHTML=`<div class="top"><button class="pill" onclick="home()">🏠</button>${G.solo?`<div class="pill" id="hp"></div>`:''}</div><div id="tw"></div>
+<div class="panel"><div class="c"><span class="turn" style="background:${t.c}">${G.solo?'Твій хід!':'Хід команди: '+t.e+' '+t.n}</span></div>${cfg.time?'<div class="tbar"><i id="tb"></i><b id="tt"></b></div>':''}<div class="qe">${q.big}</div><div class="qp">${q.p}</div>
+<div class="opts">${q.o.map((o,i)=>`<button class="opt" data-i="${i}">${o.l}</button>`).join('')}</div><div class="msg" id="m"></div><div id="nx"></div></div>`;
+if(G.solo)hearts();towers();document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(b));
+clearInterval(tm);if(cfg.time){let L=cfg.time*10;tm=setInterval(()=>{L--;const f=$('#tb');if(!f){clearInterval(tm);return}f.style.width=L/(cfg.time*10)*100+'%';f.style.background=L<cfg.time*3?'#ff6b6b':'#4cd964';$('#tt').textContent='⏱ '+Math.ceil(L/10);if(L<=0)answer(null)},100)}}
+function hearts(){$('#hp').textContent='❤️'.repeat(G.hearts)+'🖤'.repeat(3-G.hearts)}
+
+function answer(b){if(G.lock)return;G.lock=1;clearInterval(tm);const q=G.q,o=b?q.o[+b.dataset.i]:{ok:false},t=G.teams[G.turn],bs=[...document.querySelectorAll('.opt')];let msg;
+if(o.ok){b.classList.add('good');G.streak++;let add=1;const r=Math.random();
+ if(r<.15){add=2;msg='🎁 Скриня! +2 блоки!'}
+ else if(r<.27&&!G.solo){const v=G.teams.filter((x,i)=>i!=G.turn&&x.b>0).sort((a,b)=>b.b-a.b)[0];msg='💥 TNT! +1 блок';if(v){v.b--;msg+=` · ${v.e} втрачає блок!`}}
+ else msg='✅ Правильно! +1 блок';
+ if(G.solo&&G.streak%3==0){add++;msg+=' 🔥 Серія!'}
+ t.b=Math.min(G.goal,t.b+add);G.new=G.turn}
+else{G.streak=0;if(b)b.classList.add('bad');bs.forEach((x,i)=>{if(q.o[i].ok)x.classList.add('good')});msg=(b?'❌':'⏰ Час вийшов!')+' Правильна відповідь — зелена';if(G.solo){G.hearts--;hearts()}}
+$('#m').textContent=msg;towers();
+const win=t.b>=G.goal,dead=G.solo&&G.hearts<=0;
+$('#nx').innerHTML=`<button class="go" id="go">${win||dead?'🏆 Фінал':'Далі ➜'}</button>`;
+$('#go').onclick=()=>{if(win)return end(t);if(dead)return end(null);G.turn=(G.turn+1)%G.teams.length;ask()}}
+
+function end(w){if(w)confetti();G.new=-1;
+app.innerHTML=`<h1>${w?'🏆 Перемога!':'💥 Гру завершено'}</h1><div class="panel c"><div class="qe">${w?w.e:'🧟'}</div><div class="qp">${w?(G.solo?'Ти збудував(-ла) вежу!':'Перемагають: '+w.n+'!'):'Блоків: '+G.teams[0].b+'. Спробуй ще раз!'}</div><div id="tw"></div><button class="go" onclick="start()">🔁 Грати ще</button><button class="ghost" onclick="home()">🏠 Меню</button></div>`;towers()}
+let tm;
+function tap(){let sc=0,t=45,cb=0,w;clearInterval(tm);
+app.innerHTML=`<div class="top"><button class="pill" onclick="clearInterval(tm);home()">🏠</button><div class="pill" id="ts">⏱ 45</div><div class="pill" id="sc">⭐ 0</div></div><div class="panel c"><div class="sub" style="margin:0">Тапай правильну фразу якомога швидше! Помилка = −2 с</div><div class="qe" id="tq"></div><div class="qp" id="tp"></div><div class="opts t2" id="tl"></div><div class="msg" id="m"></div></div>`;
+function round(){const ty=Math.random()<.5;w=pick(W.filter(x=>x!==w));$('#tq').textContent=ty?w.e:'💬';$('#tp').textContent=ty?'':w.ua;
+$('#tl').innerHTML=sh([w,...sh(W.filter(x=>x!==w)).slice(0,5)]).map(x=>`<button class="opt" data-w="${W.indexOf(x)}">${x.en}</button>`).join('');
+document.querySelectorAll('#tl .opt').forEach(b=>b.onclick=()=>{if(W[+b.dataset.w]===w){cb++;sc+=cb>=3?2:1;$('#sc').textContent='⭐ '+sc;$('#m').textContent=cb>=3?'🔥 Комбо x'+cb:'';round()}else{cb=0;t=Math.max(0,t-2);$('#ts').textContent='⏱ '+t;b.classList.add('bad');b.disabled=true;$('#m').textContent='−2 с'}})}
+function fin(){let best=0;try{best=+localStorage.getItem('db_best')||0}catch(e){}const nb=sc>best;if(nb){best=sc;try{localStorage.setItem('db_best',sc)}catch(e){}confetti()}
+app.innerHTML=`<h1>⚡ Час вийшов!</h1><div class="panel c"><div class="qe">${nb?'🏆':'⭐'}</div><div class="qp">Рахунок: ${sc}</div><div class="sub">${nb?'Новий рекорд!':'Рекорд: '+best}</div><button class="go" onclick="tap()">🔁 Ще раз</button><button class="ghost" onclick="home()">🏠 Меню</button></div>`}
+round();tm=setInterval(()=>{t--;$('#ts').textContent='⏱ '+Math.max(t,0);if(t<=0){clearInterval(tm);fin()}},1000)}
+
+function sent(lvl=1){const N=8;let i=0,sc=0,lw;clearInterval(tm);
+function fin(){const r=sc>=7?3:sc>=5?2:1;if(sc>=6)confetti();app.innerHTML=`<h1>🧩 Готово!</h1><div class="panel c"><div class="qe">${'⭐'.repeat(r)}</div><div class="qp">${sc} з ${N} з першої спроби</div><button class="go" onclick="sent(${lvl})">🔁 Ще раз</button><button class="ghost" onclick="home()">🏠 Меню</button></div>`}
+function round(){if(i>=N)return fin();let w;do w=pick(W);while(w==lw);lw=w;
+const neg=Math.random()<.5,t=pick(T.filter(x=>w.t.includes(x.id)!=neg)),P=x=>lvl==2?x.split(' '):[x],tk=['I',...(neg?['don’t']:[]),...P(w.en),...P(t.en)],ans=tk.join(' ')+'.';
+let bank=sh([...tk,...(lvl==2?(neg?['doesn’t','not']:['don’t','doesn’t']):[neg?'doesn’t':'don’t'])]).map((x,k)=>({x,k})),line=[],miss=0,done=0;
+app.innerHTML=`<div class="top"><button class="pill" onclick="home()">🏠</button><div class="pill">${'⭐'.repeat(lvl)} ${i+1}/${N}</div><div class="pill">⭐ ${sc}</div></div><div class="panel c">${lvl==1?'<div class="rule"><span>✅ I …</span><span>❌ I don’t …</span></div>':''}<div class="sc"><div>${w.e}</div><div>${t.e}</div><div>${neg?'❌':'✅'}</div></div><div style="opacity:.7;font-size:18px">${w.ua} · ${t.ua}</div><div class="line" id="ln"></div><div class="bank" id="bk"></div><div class="msg" id="m">Склади речення з блоків!</div><div id="nx"><button class="go" id="ck">✔ Перевірити</button></div></div>`;
+function draw(){$('#ln').innerHTML=line.map(o=>`<button class="tl" data-k="${o.k}">${o.x}</button>`).join('');$('#bk').innerHTML=bank.map(o=>`<button class="tl" data-k="${o.k}">${o.x}</button>`).join('')}
+function mv(a,b,k){const j=a.findIndex(o=>o.k==k);b.push(...a.splice(j,1));draw()}
+$('#ln').onclick=e=>{const b=e.target.closest('.tl');if(b&&!done)mv(line,bank,b.dataset.k)};
+$('#bk').onclick=e=>{const b=e.target.closest('.tl');if(b&&!done)mv(bank,line,b.dataset.k)};
+function nxt(){$('#nx').innerHTML='<button class="go" id="go">Далі ➜</button>';$('#go').onclick=()=>{i++;round()}}
+$('#ck').onclick=()=>{if(done)return;const got=line.map(o=>o.x).join(' ')+'.';
+if(got==ans){done=1;if(!miss)sc++;$('#ln').classList.add('ok');$('#m').textContent='✅ '+ans;nxt()}
+else{miss++;$('#ln').classList.remove('bad');void $('#ln').offsetWidth;$('#ln').classList.add('bad');
+if(miss>=2){done=1;$('#m').textContent='Правильно так: '+ans;nxt()}else $('#m').textContent=neg?'Ой! Для ❌ потрібне don’t (для I)':'Ой! Для ✅ don’t не потрібне'}};
+draw()}
+round()}
+home();
+</script>
+</body>
+</html>
